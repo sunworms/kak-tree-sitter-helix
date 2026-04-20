@@ -86,11 +86,11 @@ let
       '';
     };
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "kak-tree-sitter-grammars";
-  version = helix.version;
+  version = "dirty";
 
-  src = helix.repo;
+  src = helix;
 
   dontUnpack = true;
   dontPatch = true;
@@ -101,7 +101,7 @@ stdenv.mkDerivation rec {
 
   buildPhase =
     let
-      languagesConfig = builtins.fromTOML (builtins.readFile "${src}/languages.toml");
+      languagesConfig = builtins.fromTOML (builtins.readFile "${finalAttrs.src}/languages.toml");
       isGitGrammar =
         grammar:
         builtins.hasAttr "source" grammar
@@ -135,7 +135,7 @@ stdenv.mkDerivation rec {
             IFS=','
             for parent_language in $parent_languages
             do
-              parent_content="$(resolve_inherited_queries "${src}/runtime/queries/$parent_language/$query_file")"
+              parent_content="$(resolve_inherited_queries "${finalAttrs.src}/runtime/queries/$parent_language/$query_file")"
               content="$(printf '%s\n%s' "$parent_content" "$content")"
             done
             echo "$content"
@@ -144,7 +144,7 @@ stdenv.mkDerivation rec {
           fi
         }
 
-        for file in $(find ${src}/runtime/queries/ -type f -name '*.scm')
+        for file in $(find ${finalAttrs.src}/runtime/queries/ -type f -name '*.scm')
         do
           lang="$(echo "$file" | rev | cut --delimiter='/' --fields=2 | rev)"
           query_file="$(echo "$file" | rev | cut --delimiter='/' --fields=1 | rev)"
@@ -163,4 +163,4 @@ stdenv.mkDerivation rec {
 
       ${resolveInheritedQueries}
     '';
-}
+})

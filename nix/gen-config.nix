@@ -109,7 +109,7 @@ let
     "warning"
   ];
 
-  languagesConfig = builtins.fromTOML (builtins.readFile "${helix.repo}/languages.toml");
+  languagesConfig = builtins.fromTOML (builtins.readFile "${helix}/languages.toml");
 
   isGitGrammar =
     grammar:
